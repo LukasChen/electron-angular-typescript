@@ -7,6 +7,8 @@ This is a fork repository of electron-boilerplate which goal is to add / modify 
 4. angular.js
 5. remove esperanto and just simply concat js files.
 
+Warning: This repository is a work in progress, and the above mentioned goals are not yet fully addressed.
+
 --------------
 electron-boilerplate
 ==============
