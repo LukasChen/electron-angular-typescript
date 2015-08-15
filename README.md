@@ -1,3 +1,11 @@
+
+This is a fork repository of electron-boilerplate which goal is to add / modified the ff:
+1. livereload
+2. sass
+3. typescript
+4. angular
+
+--------------
 electron-boilerplate
 ==============
 Comprehensive boilerplate application for [Electron](http://electron.atom.io).  
