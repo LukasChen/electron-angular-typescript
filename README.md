@@ -1,5 +1,5 @@
 
-This is a fork repository of electron-boilerplate which goal is to add / modified the ff:
+This is a fork repository of electron-boilerplate which goal is to add / modify the ff:
 
 1. livereload
 2. sass
