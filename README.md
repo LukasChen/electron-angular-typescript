@@ -1,10 +1,11 @@
 
 This is a fork repository of electron-boilerplate which goal is to add / modify the ff:
 
-1. livereload
-2. sass
-3. typescript
+1. livereload: changes to js (renderer), html and css files will execute livereload.
+2. sass instead of less, using gulp-concat to join .scss files inside app folder.
+3. typescript (will be handled by the editor. using visual studio code).
 4. angular.js
+5. remove esperanto and just simply concat js files.
 
 --------------
 electron-boilerplate
