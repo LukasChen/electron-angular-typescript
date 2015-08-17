@@ -1,25 +1,22 @@
 'use strict';
 
 var gulp = require('gulp');
-var less = require('gulp-less');
-var esperanto = require('esperanto');
-var map = require('vinyl-map');
+var gutil = require('gulp-util');
+var sass = require('gulp-sass');
+var inject = require('gulp-inject');
+var ts = require('gulp-typescript');
+var series = require('stream-series');
+var livereload = require('gulp-livereload');
+var wiredep = require('wiredep').stream;
 var jetpack = require('fs-jetpack');
-
 var utils = require('./utils');
-
 var projectDir = jetpack;
 var srcDir = projectDir.cwd('./app');
 var destDir = projectDir.cwd('./build');
-
 var paths = {
-    jsCodeToTranspile: [
-        'app/**/*.js',
-        '!app/main.js',
-        '!app/spec.js',
-        '!app/node_modules/**',
-        '!app/bower_components/**',
-        '!app/vendor/**'
+    devDir: [
+        // './renderer/**/*.js',
+        './renderer/**/*.html'  
     ],
     copyFromAppDir: [
         './main.js',
@@ -27,9 +24,18 @@ var paths = {
         './node_modules/**',
         './bower_components/**',
         './vendor/**',
-        './**/*.html'
-    ],
-}
+        // './renderer/**/*.js',
+        './renderer/**/*.html',
+    ]
+};
+
+var errorHandler = function(title) {
+  return function(err) {
+    gutil.log(gutil.colors.red('[' + title + ']'), err.toString());
+    this.emit('end');
+  };
+};
+
 
 // -------------------------------------
 // Tasks
@@ -40,39 +46,101 @@ gulp.task('clean', function(callback) {
 });
 
 
+var injectBowerTask = function () {
+    return gulp.src(srcDir.path('renderer/app.html'))
+    .pipe(wiredep({ cwd: 'app' }))
+    .pipe(gulp.dest(srcDir.path('renderer/')));
+}
+gulp.task('inject-bower', injectBowerTask);
+
+
 var copyTask = function () {
     return projectDir.copyAsync('app', destDir.path(), {
         overwrite: true,
         matching: paths.copyFromAppDir
     });
 };
-gulp.task('copy', ['clean'], copyTask);
-gulp.task('copy-watch', copyTask);
+gulp.task('copy', ['clean', 'inject-bower'], copyTask);
 
 
-var transpileTask = function () {
-    return gulp.src(paths.jsCodeToTranspile)
-    .pipe(map(function(code, filename) {
-        try {
-            var transpiled = esperanto.toAmd(code.toString(), { strict: true });
-        } catch (err) {
-            throw new Error(err.message + ' ' + filename);
-        }
-        return transpiled.code;
-    }))
-    .pipe(gulp.dest(destDir.path()));
+var srcTask = function () {
+    return projectDir.copyAsync('app', destDir.path(), {
+        overwrite: true,
+        matching: paths.devDir
+    });
 };
-gulp.task('transpile', ['clean'], transpileTask);
-gulp.task('transpile-watch', transpileTask);
+gulp.task('src-watch', srcTask);
 
 
-var lessTask = function () {
-    return gulp.src('app/stylesheets/main.less')
-    .pipe(less())
-    .pipe(gulp.dest(destDir.path('stylesheets')));
+var livereloadTask = function () {
+    return gulp.src([
+        // destDir.path('renderer/**/*.js'), 
+        destDir.path('renderer/**/*.html')
+    ])
+    .pipe(livereload());
 };
-gulp.task('less', ['clean'], lessTask);
-gulp.task('less-watch', lessTask);
+gulp.task('livereload-watch', ['src-watch'], livereloadTask);
+
+
+var sassTask = function () {
+    return gulp.src('app/renderer/**/*.scss')
+    .pipe(sass())
+    .pipe(gulp.dest(function() {
+        return destDir.path('renderer/');
+    }));
+};
+var sassTaskDev = function () {
+    return sassTask()
+    .pipe(livereload());
+};
+gulp.task('sass', ['clean'], sassTask);
+gulp.task('sass-watch', sassTaskDev);
+
+
+var typescriptTask = function () {
+    
+    var tsProject = ts.createProject({
+        target: 'es5',
+        sortOutput: true
+    });
+    
+    return gulp.src('app/renderer/**/*.ts')
+    .pipe(ts(tsProject))
+        .on('error', errorHandler('TypeScript'))
+    .pipe(gulp.dest(function() {
+        return destDir.path('renderer/');
+    }));
+};
+var typescriptTaskDev = function () {
+    return typescriptTask()
+    .pipe(livereload());
+};
+gulp.task('typescript', ['clean'], typescriptTask);
+gulp.task('typescript-watch', typescriptTaskDev);
+
+
+var injectTask = function () {
+    var target = gulp.src(destDir.path('renderer/app.html')); 
+    var sources = gulp.src([ 
+        destDir.path('renderer/**/*.css'),
+        destDir.path('renderer/**/*.js'),
+        '!'+destDir.path('renderer/app.js')
+    ], {
+        read: false
+    });
+    var angularEntry = gulp.src([
+        destDir.path('renderer/app.js')
+    ], {
+        read: false
+    });
+    
+    return target.pipe(inject(series(sources, angularEntry), { relative: true }))
+    .pipe(gulp.dest(destDir.path('renderer/')));
+};
+gulp.task('inject', ['sass', 'typescript', 'copy'], injectTask);
+gulp.task('inject-sass', ['sass-watch'], injectTask);
+gulp.task('inject-typescript', ['typescript-watch'], injectTask);
+gulp.task('inject-livereload', ['livereload-watch'], injectTask);
 
 
 gulp.task('finalize', ['clean'], function () {
@@ -101,10 +169,11 @@ gulp.task('finalize', ['clean'], function () {
 
 
 gulp.task('watch', function () {
-    gulp.watch(paths.jsCodeToTranspile, ['transpile-watch']);
-    gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
-    gulp.watch('app/**/*.less', ['less-watch']);
+    livereload.listen({ reloadPage: 'app.html' });
+    gulp.watch(paths.devDir, { cwd: 'app' }, ['inject-livereload']);
+    gulp.watch('app/renderer/**/*.ts', ['inject-typescript']);
+    gulp.watch('app/renderer/**/*.scss', ['inject-sass']);
 });
 
 
-gulp.task('build', ['transpile', 'less', 'copy', 'finalize']);
+gulp.task('build', ['inject', 'finalize']);

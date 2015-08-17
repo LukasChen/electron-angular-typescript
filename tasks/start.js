@@ -45,6 +45,7 @@ var runGulpWatch = function () {
         // Just respawn it then.
         runGulpWatch();
     });
+    
 };
 
 var runApp = function () {

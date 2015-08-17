@@ -21,7 +21,7 @@ app.on('ready', function () {
         width: mainWindowState.width,
         height: mainWindowState.height
     });
-    mainWindow.loadUrl('file://' + __dirname + '/spec.html');
+    mainWindow.loadUrl('file://' + __dirname + '/renderer/app.spec.html');
 
     devHelper.setDevMenu();
     mainWindow.openDevTools();
