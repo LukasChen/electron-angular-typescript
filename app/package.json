@@ -1,10 +1,10 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "identifier": "com.example.electron-boilerplate",
-  "description": "Starter for your Electron application. Out of the box ready for serious stuff.",
-  "version": "0.1.0",
-  "author": "Mr Gumby <gumby@sillywalks.com>",
+  "name": "electron-angular-typescript",
+  "productName": "Electron Angular Typescript",
+  "identifier": "com.example.electron-angular-typescript",
+  "description": "Modified version of Electron Boilerplate",
+  "version": "0.0.0",
+  "author": "Val <val.samonte@gmail.com>",
   "main": "main.js",
   "config": {
     "target": "development"
