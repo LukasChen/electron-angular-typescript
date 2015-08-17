@@ -13,7 +13,7 @@ Warning: This repository is a work in progress. Please bear in mind that all mod
 
 To start, do the following:
 ```
-git clone https://github.com/szwacz/electron-boilerplate.git
+git clone https://github.com/val-samonte/electron-angular-typescript.git
 cd electron-angular-typescript
 npm install
 cd app
@@ -21,6 +21,8 @@ bower install
 cd ..
 npm start
 ```
+
+Below is the original readme of the author
 
 --------------
 electron-boilerplate
