@@ -11,6 +11,19 @@ This is a forked repository of [electron-boilerplate](https://github.com/szwacz/
 
 Warning: This repository is a work in progress. Please bear in mind that all modifications are not optimized. Use it at your own risk.
 
+To start, do the following:
+```
+git clone https://github.com/val-samonte/electron-angular-typescript.git
+cd electron-angular-typescript
+npm install
+cd app
+bower install
+cd ..
+npm start
+```
+
+Below is the original readme of the author
+
 --------------
 electron-boilerplate
 ==============
