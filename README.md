@@ -5,10 +5,11 @@ This is a fork repository of electron-boilerplate which goal is to add / modify 
 2. sass instead of less
 3. typescript
 4. angular.js
-5. remove esperanto
-6. auto inject styles and scripts
+5. angular material
+6. remove esperanto
+7. auto inject styles and scripts
 
-Warning: This repository is a work in progress, and the above mentioned goals are not yet fully addressed.
+Warning: This repository is a work in progress. Please bear in mind that all modifications are not optimized. Use it at your own risk.
 
 --------------
 electron-boilerplate
